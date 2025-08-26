@@ -1,5 +1,6 @@
+import asyncio
+import aiohttp
 from random import randrange
-
 from flask import abort, flash, redirect, render_template, url_for
 
 from . import app, db
@@ -10,10 +11,10 @@ from .yadisk import upload_files_to_yadisk
 
 
 @app.route('/upload', methods=['GET', 'POST'])
-def file_upload_view():
+async def file_upload_view():
     form = FileUploadForm()
     if form.validate_on_submit():
-        urls = upload_files_to_yadisk(form.files.data)
+        urls = await upload_files_to_yadisk(form.files.data)
         for url in urls:
             short_hash = generate_short_code()
             url_map = URLMap(
