@@ -5,18 +5,44 @@ import requests
 import io
 
 from . import app, db
-from .forms import FileUploadForm
+from .forms import FileUploadForm, ShortLinkForm
 from .models import URLMap
 from .utils import (
     generate_short_id,
     generate_short_link,
     get_filename_from_url,
-    is_yandex_disk_link
+    is_yandex_disk_link,
+    validate_user_code
 )
 from .yadisk import upload_files_to_yadisk
 
 
-@app.route('/upload', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
+def link_cut_view():
+    form = ShortLinkForm()
+    if form.validate_on_submit():
+        if form.custom_id.data and validate_user_code(form.custom_id.data):
+            original_link = form.original_link.data
+            custom_id = form.custom_id.data
+            db.session.add(URLMap(
+                original=original_link,
+                short=custom_id
+            ))
+            short_link = generate_short_link(custom_id)
+        else:
+            original_link = form.original_link.data
+            short_id = generate_short_id()
+            db.session.add(URLMap(
+                original=original_link,
+                short=short_id
+            ))
+            short_link = generate_short_link(short_id)
+        db.session.commit()
+        return render_template('link.html', form=form, url=short_link)
+    return render_template('link.html', form=form)
+
+
+@app.route('/files', methods=['GET', 'POST'])
 async def file_upload_view():
     form = FileUploadForm()
     if form.validate_on_submit():
