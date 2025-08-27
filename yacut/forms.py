@@ -6,7 +6,7 @@ from wtforms.validators import DataRequired, Length, Optional, Regexp
 
 class ShortLinkForm(FlaskForm):
     original_link = URLField(
-        'Введите адрес длинной ссылки',
+        'Длинная ссылка',
         validators=[DataRequired(message='Обязательное поле'), Length(1, 256)],
     )
     custom_id = StringField(
@@ -25,12 +25,23 @@ class ShortLinkForm(FlaskForm):
 
 class FileUploadForm(FlaskForm):
     files = MultipleFileField(
+        'Файл не выбран',
         validators=[
             FileAllowed(
-                ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'txt', 'py'],
+                [
+                    'jpg', 'jpeg', 'png', 'gif', 'bmp',
+                    'txt', 'py', 'pdf', 'docx', 'xlsx',
+                    'csv', 'md', 'rtf',
+                    'mp3', 'wav',
+                    'mp4', 'avi', 'mov',
+                    'zip', 'rar', '7z'
+                ],
                 message=(
-                    'Выберите файлы с расширением '
-                    '.jpg, .jpeg, .png, .gif, .txt, .py или .bmp'
+                    'Выберите файлы с расширением: '
+                    '.jpg, .jpeg, .png, .gif, .bmp, '
+                    '.txt, .py, .pdf, .docx, .xlsx, .csv, .md, .rtf, '
+                    '.mp3, .wav, .mp4, .avi, .mov, '
+                    '.zip, .rar, .7z'
                 )
             )
         ]

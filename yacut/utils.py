@@ -24,7 +24,10 @@ def validate_user_code(user_code):
     user_code = user_code.strip()
     if not ALLOWED_CHARS.fullmatch(user_code):
         raise ValueError("Только латинские буквы/цифры, длина ≤16")
-    if user_code in RESERVED:
+    if (
+        (user_code in RESERVED)
+        or URLMap.query.filter_by(short=user_code).first()
+    ):
         raise ValueError(
             "Предложенный вариант короткой ссылки уже существует.")
     return user_code

@@ -1,8 +1,7 @@
-from flask import redirect, render_template
-from werkzeug.urls import iri_to_uri
-from flask import send_file
-import requests
 import io
+import requests
+from flask import redirect, render_template, send_file
+from werkzeug.urls import iri_to_uri
 
 from . import app, db
 from .forms import FileUploadForm, ShortLinkForm
