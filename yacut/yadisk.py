@@ -31,12 +31,13 @@ async def upload_files_to_yadisk(files):
                         upload_file_and_get_url(session, file)
                     )
                 )
-                urls = await asyncio.gather(*tasks)
-            return urls
+                results = await asyncio.gather(*tasks)
+            return results
 
 
 async def upload_file_and_get_url(session, file):
-    print('type:         ', file.filename)
+    filename = file.filename
+
     payload = {
         'path': f'app:/{file.filename}',
         'overwrite': 'True'
@@ -66,4 +67,4 @@ async def upload_file_and_get_url(session, file):
     ) as response_3:
         data = await response_3.json()
         link = data['href']
-    return link
+    return filename, link

@@ -1,6 +1,8 @@
 import random
 import re
 import string
+from flask import request
+
 from .models import URLMap
 
 ALLOWED_CHARS = re.compile(r'^[A-Za-z0-9]{1,16}$')
@@ -27,6 +29,6 @@ def validate_user_code(user_code):
     return user_code
 
 
-def generate_short_link(request, short_code):
+def generate_short_link(short_code):
     short_link = request.url_root + short_code
     return short_link
