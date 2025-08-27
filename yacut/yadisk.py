@@ -1,5 +1,7 @@
+import aiohttp
 import asyncio
-import ssl, certifi, aiohttp
+import certifi
+import ssl
 import urllib
 
 from . import app
