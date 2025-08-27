@@ -4,32 +4,33 @@ import string
 from flask import request
 from urllib.parse import urlparse, parse_qs
 
+from .error_handlers import InvalidAPIUsage
 from .models import URLMap
 
 ALLOWED_CHARS = re.compile(r'^[A-Za-z0-9]{1,16}$')
 RESERVED = {"files"}
 
 
-def generate_short_id(length=6):
+def get_unique_short_id(length=6):
     characters = string.ascii_letters + string.digits
     max_attempts = 10
     for attempt in range(max_attempts):
         short_id = ''.join(random.choice(characters) for _ in range(length))
         if not URLMap.query.filter_by(short=short_id).first():
             return short_id
-    return generate_short_id(length + 1)
+    return get_unique_short_id(length + 1)
 
 
 def validate_user_code(user_code):
     user_code = user_code.strip()
     if not ALLOWED_CHARS.fullmatch(user_code):
-        raise ValueError("Только латинские буквы/цифры, длина ≤16")
-    if (
-        (user_code in RESERVED)
-        or URLMap.query.filter_by(short=user_code).first()
-    ):
-        raise ValueError(
-            "Предложенный вариант короткой ссылки уже существует.")
+        raise ValueError('Только латинские буквы/цифры, длина ≤16')
+    if user_code in RESERVED:
+        raise InvalidAPIUsage(
+            'Указано недопустимое имя для короткой ссылки', 400)
+    if URLMap.query.filter_by(short=user_code).first():
+        raise InvalidAPIUsage(
+            'Предложенный вариант короткой ссылки уже существует.', 400)
     return user_code
 
 

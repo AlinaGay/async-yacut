@@ -7,9 +7,9 @@ from . import app, db
 from .forms import FileUploadForm, ShortLinkForm
 from .models import URLMap
 from .utils import (
-    generate_short_id,
     generate_short_link,
     get_filename_from_url,
+    get_unique_short_id,
     is_yandex_disk_link,
     validate_user_code
 )
@@ -30,7 +30,7 @@ def link_cut_view():
             short_link = generate_short_link(custom_id)
         else:
             original_link = form.original_link.data
-            short_id = generate_short_id()
+            short_id = get_unique_short_id()
             db.session.add(URLMap(
                 original=original_link,
                 short=short_id
@@ -48,7 +48,7 @@ async def file_upload_view():
         results = await upload_files_to_yadisk(form.files.data)
         pairs = []
         for filename, url in results:
-            short_id = generate_short_id()
+            short_id = get_unique_short_id()
             db.session.add(URLMap(
                 original=url,
                 short=short_id
