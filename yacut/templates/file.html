@@ -31,7 +31,16 @@
           </div>
           <div class="col-sm">
             <p class="text-center">
-            <h5 class="text-center">Пример информационного сообщения</h5>
+            {% if pairs %}
+              <ul style="list-style: none; padding: 0;">
+                {% for pair in pairs %}
+                  <li style="margin-bottom: 8px;">
+                    {{ pair.filename }}&nbsp;—&nbsp;
+                    <a href="{{ pair.url }}"> {{ pair.url }}</a>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% endif %}
             </p>
           </div>
           <div class="col-sm">
