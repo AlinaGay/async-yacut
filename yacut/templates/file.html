@@ -26,25 +26,25 @@
       </div>
 
       <div class="container">
-        <div class="row ">
+        <div class="row">
+          <div class="col-sm"></div>
           <div class="col-sm">
-          </div>
-          <div class="col-sm">
-            <p class="text-center">
             {% if pairs %}
-              <ul style="list-style: none; padding: 0;">
+            <table class="table">
+              <tbody>
                 {% for pair in pairs %}
-                  <li style="margin-bottom: 8px;">
-                    {{ pair.filename }}&nbsp;—&nbsp;
-                    <a href="{{ pair.url }}"> {{ pair.url }}</a>
-                  </li>
+                <tr>
+                  <td class="text-nowrap w-75">{{ pair.filename }}</td>
+                  <td class="text-end text-nowrap w-25">
+                    <a href="{{ pair.url }}">{{ pair.url }}</a>
+                  </td>
+                </tr>
                 {% endfor %}
-              </ul>
+              </tbody>
+            </table>
             {% endif %}
-            </p>
           </div>
-          <div class="col-sm">
-          </div>
+          <div class="col-sm"></div>
         </div>
       </div>
 
