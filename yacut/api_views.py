@@ -37,15 +37,23 @@ def create_short_link():
     if not original_url:
         raise APIUsageError('"url" является обязательным полем!', 400)
 
-    short_code = data.get('custom_id')
-    if (short_code in RESERVED) or (not ALLOWED_CHARS.fullmatch(short_code)):
-        raise APIUsageError(
-            'Указано недопустимое имя для короткой ссылки', 400)
-    if URLMap.query.filter_by(short=short_code).first():
-        raise APIUsageError(
-            'Предложенный вариант короткой ссылки уже существует.', 400)
+    short_code = (data.get('custom_id') or '').strip()
+
     if not short_code:
         short_code = get_unique_short_id()
+    else:
+        if short_code in RESERVED:
+            raise APIUsageError(
+                'Предложенный вариант короткой ссылки уже существует.', 400
+            )
+        if not ALLOWED_CHARS.fullmatch(short_code):
+            raise APIUsageError(
+                'Указано недопустимое имя для короткой ссылки', 400
+            )
+        if URLMap.query.filter_by(short=short_code).first():
+            raise APIUsageError(
+                'Предложенный вариант короткой ссылки уже существует.', 400
+            )
 
     db.session.add(URLMap(original=original_url, short=short_code))
     db.session.commit()
