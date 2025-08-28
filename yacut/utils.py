@@ -4,7 +4,6 @@ import string
 from flask import request
 from urllib.parse import urlparse, parse_qs
 
-from .error_handlers import InvalidAPIUsage
 from .models import URLMap
 
 ALLOWED_CHARS = re.compile(r'^[A-Za-z0-9]{1,16}$')
@@ -26,11 +25,10 @@ def validate_user_code(user_code):
     if not ALLOWED_CHARS.fullmatch(user_code):
         raise ValueError('Только латинские буквы/цифры, длина ≤16')
     if user_code in RESERVED:
-        raise InvalidAPIUsage(
-            'Указано недопустимое имя для короткой ссылки', 400)
+        raise ValueError('Указано недопустимое имя для короткой ссылки')
     if URLMap.query.filter_by(short=user_code).first():
-        raise InvalidAPIUsage(
-            'Предложенный вариант короткой ссылки уже существует.', 400)
+        raise ValueError(
+            'Предложенный вариант короткой ссылки уже существует.')
     return user_code
 
 

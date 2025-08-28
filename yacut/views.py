@@ -22,28 +22,22 @@ def link_cut_view():
 
     if form.validate_on_submit():
         original_link = form.original_link.data
+
         if form.custom_id.data:
             try:
-                validate_user_code(form.custom_id.data)
-                custom_id = form.custom_id.data
-                db.session.add(URLMap(
-                    original=original_link,
-                    short=custom_id
-                ))
-                short_link = generate_short_link(custom_id)
+                short_code = validate_user_code(form.custom_id.data)
             except ValueError as e:
                 flash(str(e), 'error')
                 return render_template('link.html', form=form)
-
         else:
-            short_id = get_unique_short_id()
-            db.session.add(URLMap(
-                original=original_link,
-                short=short_id
-            ))
-            short_link = generate_short_link(short_id)
+            short_code = get_unique_short_id()
 
+        db.session.add(URLMap(
+            original=original_link,
+            short=short_code
+        ))
         db.session.commit()
+        short_link = generate_short_link(short_code)
         return render_template('link.html', form=form, url=short_link)
     return render_template('link.html', form=form)
 
