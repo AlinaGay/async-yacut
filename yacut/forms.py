@@ -12,8 +12,8 @@ class ShortLinkForm(FlaskForm):
     custom_id = StringField(
         'Ваш вариант короткой ссылки',
         validators=[
-            Length(1, 16),
             Optional(),
+            Length(max=16),
             Regexp(
                 r'^[A-Za-z0-9]+$',
                 message='Только латинские буквы и цифры'

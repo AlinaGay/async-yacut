@@ -18,6 +18,9 @@
               {{ form.csrf_token }}
               {{ form.original_link(class="form-control form-control-lg py-2 mb-3", placeholder=form.original_link.label.text) }}
               {{ form.custom_id(class="form-control form-control-lg py-2 mb-3", placeholder=form.custom_id.label.text) }}
+              {% for e in form.custom_id.errors %}
+                <div class="invalid-feedback d-block">{{ e }}</div>
+              {% endfor %}
               {{ form.submit(class="btn btn-primary") }}
             </form>
           </div>
@@ -28,6 +31,15 @@
 
       <div class="container">
         <div class="row ">
+          <p class="text-center">
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                {% for message in messages %}
+                  {{ message }}
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+          </p>
           {% if url %}
             <div class="col-sm">
               <p class="text-center">

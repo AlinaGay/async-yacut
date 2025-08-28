@@ -1,6 +1,6 @@
 import io
 import requests
-from flask import redirect, render_template, send_file
+from flask import flash, redirect, render_template, send_file
 from werkzeug.urls import iri_to_uri
 
 from . import app, db
@@ -19,23 +19,30 @@ from .yadisk import upload_files_to_yadisk
 @app.route('/', methods=['GET', 'POST'])
 def link_cut_view():
     form = ShortLinkForm()
+
     if form.validate_on_submit():
-        if form.custom_id.data and validate_user_code(form.custom_id.data):
-            original_link = form.original_link.data
-            custom_id = form.custom_id.data
-            db.session.add(URLMap(
-                original=original_link,
-                short=custom_id
-            ))
-            short_link = generate_short_link(custom_id)
+        original_link = form.original_link.data
+        if form.custom_id.data:
+            try:
+                validate_user_code(form.custom_id.data)
+                custom_id = form.custom_id.data
+                db.session.add(URLMap(
+                    original=original_link,
+                    short=custom_id
+                ))
+                short_link = generate_short_link(custom_id)
+            except ValueError as e:
+                flash(str(e), 'error')
+                return render_template('link.html', form=form)
+
         else:
-            original_link = form.original_link.data
             short_id = get_unique_short_id()
             db.session.add(URLMap(
                 original=original_link,
                 short=short_id
             ))
             short_link = generate_short_link(short_id)
+
         db.session.commit()
         return render_template('link.html', form=form, url=short_link)
     return render_template('link.html', form=form)
