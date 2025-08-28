@@ -1,3 +1,16 @@
+"""Form definitions for the YaCut URL-shortening service.
+
+This module provides two Flask-WTF forms:
+
+- `ShortLinkForm`: Form for creating a short link from a long URL,
+  with optional custom short code input.
+- `FileUploadForm`: Form for uploading multiple files to Yandex Disk,
+  restricted to a set of allowed file types.
+
+Both forms use WTForms validators to enforce input constraints and
+provide user-friendly error messages.
+"""
+
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, MultipleFileField
 from wtforms import StringField, SubmitField, URLField
@@ -5,6 +18,8 @@ from wtforms.validators import DataRequired, Length, Optional, Regexp
 
 
 class ShortLinkForm(FlaskForm):
+    """Form for submitting an original URL and an optional custom short ID."""
+
     original_link = URLField(
         'Длинная ссылка',
         validators=[DataRequired(message='Обязательное поле'), Length(1, 256)],
@@ -24,6 +39,8 @@ class ShortLinkForm(FlaskForm):
 
 
 class FileUploadForm(FlaskForm):
+    """Form for uploading multiple files to Yandex Disk."""
+
     files = MultipleFileField(
         'Файл не выбран',
         validators=[

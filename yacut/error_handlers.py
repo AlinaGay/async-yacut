@@ -11,8 +11,9 @@ from flask import jsonify, render_template
 from . import app, db
 
 
-class InvalidAPIUsage(Exception):
+class APIUsageError(Exception):
     """Exception to represent a client-facing API error (HTTP 4xx)."""
+
     status_code = 400
 
     def __init__(self, message, status_code=None):
@@ -27,7 +28,7 @@ class InvalidAPIUsage(Exception):
         return dict(message=self.message)
 
 
-@app.errorhandler(InvalidAPIUsage)
+@app.errorhandler(APIUsageError)
 def invalid_api_usage(error):
     """Convert an `InvalidAPIUsage` exception into a JSON HTTP response."""
     return jsonify(error.to_dict()), error.status_code

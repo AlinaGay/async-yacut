@@ -1,3 +1,14 @@
+"""Flask views for the YaCut URL-shortening service.
+
+This module exposes three routes:
+- `link_cut_view` ("/"): HTML form to create short links for arbitrary URLs.
+- `file_upload_view` ("/files"): Async handler that uploads multiple files to
+  Yandex Disk and returns short links pointing to downloadable resources.
+- `redirect_view` ("/<short_id>"): Resolves a short ID to the original URL
+  and either redirects (generic URLs)
+  or proxies the file download (Yandex Disk).
+"""
+
 import io
 import requests
 from flask import flash, redirect, render_template, send_file
@@ -18,6 +29,7 @@ from .yadisk import upload_files_to_yadisk
 
 @app.route('/', methods=['GET', 'POST'])
 def link_cut_view():
+    """Render the main page and handle creation of short links."""
     form = ShortLinkForm()
 
     if form.validate_on_submit():
@@ -44,6 +56,7 @@ def link_cut_view():
 
 @app.route('/files', methods=['GET', 'POST'])
 async def file_upload_view():
+    """Upload multiple files to Yandex Disk and return short links."""
     form = FileUploadForm()
     if form.validate_on_submit():
         results = await upload_files_to_yadisk(form.files.data)
@@ -64,6 +77,11 @@ async def file_upload_view():
 
 @app.route('/<string:short_id>')
 def redirect_view(short_id):
+    """
+    Resolve a short ID to the original URL.
+
+    Deliver content to the client.
+    """
     url_map = URLMap.query.filter_by(short=short_id).first_or_404()
     original_url = url_map.original
 

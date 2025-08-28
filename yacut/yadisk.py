@@ -1,3 +1,20 @@
+"""Async helpers for uploading files to Yandex Disk.
+
+This module provides:
+- TLS/SSL configuration (using `certifi`) for aiohttp connections.
+- `upload_files_to_yadisk`: orchestrates concurrent uploads of multiple files.
+- `upload_file_and_get_url`: uploads a single file
+and returns its direct download URL.
+
+Notes:
+    * The functions expect Flask/Werkzeug `FileStorage` objects (e.g., from
+      `request.files.getlist(...)` or a `MultipleFileField`).
+    * Yandex Disk REST API is used:
+        - `resources/upload` to obtain a pre-signed upload URL.
+        - PUT to that URL to upload bytes.
+        - `resources/download` to obtain a direct download link.
+"""
+
 import aiohttp
 import asyncio
 import certifi
@@ -22,6 +39,7 @@ ssl_ctx = ssl.create_default_context(cafile=certifi.where())
 
 
 async def upload_files_to_yadisk(files):
+    """Upload multiple files to Yandex Disk concurrently."""
     if files is not None:
         tasks = []
         async with aiohttp.ClientSession(
@@ -38,6 +56,7 @@ async def upload_files_to_yadisk(files):
 
 
 async def upload_file_and_get_url(session, file):
+    """Upload a single file to Yandex Disk and return its download URL."""
     filename = file.filename
 
     payload = {
