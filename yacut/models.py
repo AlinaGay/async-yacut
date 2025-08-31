@@ -30,34 +30,46 @@ class URLMap(db.Model):
     short = db.Column(db.String(CUSTOM_ID_MAX_LENGTH), unique=True)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
-    # @classmethod
-    # def get_unique_short_id(cls, length=6):
-    #     characters = string.ascii_letters + string.digits
-    #     max_attempts = 10
-    #     for attempt in range(max_attempts):
-    #         short_id = ''.join(random.choice(characters) for _ in range(length))
-    #         if not cls.query.filter_by(short=short_id).first():
-    #             return short_id
-    #     return cls.get_unique_short_id(length + 1)
+    @classmethod
+    def get_unique_short_id(cls, length=6):
+        """Generate a unique short identifier not present in the database."""
+        characters = string.ascii_letters + string.digits
+        max_attempts = 10
+        for attempt in range(max_attempts):
+            short_id = (
+                ''.join(random.choice(characters) for _ in range(length))
+            )
+            if not cls.query.filter_by(short=short_id).first():
+                return short_id
+        return cls.get_unique_short_id(length + 1)
 
-    # @classmethod
-    # def validate_user_code(cls, custom_id):
-    #     """Validate a user-provided custom short code."""
-    #     code = custom_id.strip()
-    #     if code:
-    #         if not ALLOWED_CHARS.fullmatch(code):
-    #             raise ValueError('Только латинские буквы/цифры, длина ≤16')
-    #         if (
-    #             (code in RESERVED) or
-    #             cls.query.filter_by(short=code).first()
-    #         ):
-    #             raise ValueError(
-    #                 'Предложенный вариант короткой ссылки уже существует.')
+    @classmethod
+    def validate_user_code(cls, original_url, custom_id=None):
+        """Validate a user-provided custom short code."""
+        original = original_url.strip()
+        if not original:
+            raise ValueError('"url" является обязательным полем!')
+        code = custom_id.strip()
+        if code:
+            if not ALLOWED_CHARS.fullmatch(code):
+                raise ValueError(
+                    'Указано недопустимое имя для короткой ссылки')
+            if (
+                (code in RESERVED) or
+                cls.query.filter_by(short=code).first()
+            ):
+                raise ValueError(
+                    'Предложенный вариант короткой ссылки уже существует.')
 
-    #     else:
-    #         code = cls._generate_unique_short_id()    
+        else:
+            code = cls._generate_unique_short_id()
 
-    #     obj = cls(original=original, short=code)
-    #     db.session.add(obj)
-    #     db.session.commit()
-    #     return obj
+        obj = cls(original=original, short=code)
+        db.session.add(obj)
+        db.session.commit()
+        return obj
+
+    @classmethod
+    def get_by_short(cls, short_id):
+        """Return the URLMap object matching the given short_id."""
+        return cls.query.filter_by(short=short_id).first()
