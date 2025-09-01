@@ -46,23 +46,23 @@ class URLMap(db.Model):
     @classmethod
     def validate_user_code(cls, original_url, custom_id=None):
         """Validate a user-provided custom short code."""
-        original = original_url.strip()
-        if not original:
+        if not original_url:
             raise ValueError('"url" является обязательным полем!')
-        code = custom_id.strip()
-        if code:
-            if not ALLOWED_CHARS.fullmatch(code):
-                raise ValueError(
-                    'Указано недопустимое имя для короткой ссылки')
-            if (
-                (code in RESERVED) or
-                cls.query.filter_by(short=code).first()
-            ):
-                raise ValueError(
-                    'Предложенный вариант короткой ссылки уже существует.')
-
+        original = original_url.strip()
+        if not custom_id:
+            code = cls.get_unique_short_id()
         else:
-            code = cls._generate_unique_short_id()
+            code = custom_id.strip()
+            if code:
+                if not ALLOWED_CHARS.fullmatch(code):
+                    raise ValueError(
+                        'Указано недопустимое имя для короткой ссылки')
+                if (
+                    (code in RESERVED) or
+                    cls.query.filter_by(short=code).first()
+                ):
+                    raise ValueError(
+                        'Предложенный вариант короткой ссылки уже существует.')
 
         obj = cls(original=original, short=code)
         db.session.add(obj)

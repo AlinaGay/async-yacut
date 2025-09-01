@@ -16,20 +16,18 @@ The endpoints follow the specification described in the project requirements
 
 from flask import jsonify, request
 
-from . import app, db
+from . import app
 from .error_handlers import APIUsageError
 from .models import URLMap
-from .utils import (
-    ALLOWED_CHARS, RESERVED,
-    generate_short_link,
-    get_unique_short_id
-)
+from .utils import generate_short_link
 
 
 @app.route('/api/id/', methods=['POST'])
 def create_short_link():
     """Handle POST requests for creating a new short link."""
     data = request.get_json(silent=True) or {}
+    if not data:
+        raise APIUsageError('Отсутствует тело запроса', 400)
     try:
         obj = URLMap.validate_user_code(
             original_url=data.get('url'),
