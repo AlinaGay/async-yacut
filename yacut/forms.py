@@ -37,7 +37,7 @@ class ShortLinkForm(FlaskForm):
             Length(max=CUSTOM_ID_MAX_LENGTH),
             Regexp(
                 r'^[A-Za-z0-9]+$',
-                message='Только латинские буквы и цифры'
+                message='Только латинские буквы/цифры, длина ≤16'
             )
         ],
     )

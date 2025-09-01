@@ -30,41 +30,23 @@ from .utils import (
 def create_short_link():
     """Handle POST requests for creating a new short link."""
     data = request.get_json(silent=True) or {}
-    if not data:
-        raise APIUsageError('Отсутствует тело запроса', 400)
-
-    original_url = (data.get('url') or '').strip()
-    if not original_url:
-        raise APIUsageError('"url" является обязательным полем!', 400)
-
-    short_code = (data.get('custom_id') or '').strip()
-
-    if not short_code:
-        short_code = get_unique_short_id()
-    else:
-        if short_code in RESERVED:
-            raise APIUsageError(
-                'Предложенный вариант короткой ссылки уже существует.', 400
-            )
-        if not ALLOWED_CHARS.fullmatch(short_code):
-            raise APIUsageError(
-                'Указано недопустимое имя для короткой ссылки', 400
-            )
-        if URLMap.query.filter_by(short=short_code).first():
-            raise APIUsageError(
-                'Предложенный вариант короткой ссылки уже существует.', 400
-            )
-
-    db.session.add(URLMap(original=original_url, short=short_code))
-    db.session.commit()
-    short_link = generate_short_link(short_code)
-    return jsonify({"url": original_url, "short_link": short_link}), 201
+    try:
+        obj = URLMap.validate_user_code(
+            original_url=data.get('url'),
+            custom_id=data.get('custom_id'),
+        )
+    except ValueError as e:
+        raise APIUsageError(str(e), 400)
+    return jsonify({
+        "url": obj.original,
+        "short_link": generate_short_link(obj.short)
+    }), 201
 
 
 @app.route('/api/id/<string:short_id>/', methods=['GET'])
 def get_original_url(short_id):
     """Handle GET requests for resolving a short ID to its original URL."""
-    url_map = URLMap.query.filter_by(short=short_id).first()
+    url_map = URLMap.get_by_short(short_id)
     if not url_map:
         raise APIUsageError('Указанный id не найден', 404)
     return jsonify({'url': url_map.original}), 200

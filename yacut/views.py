@@ -33,24 +33,16 @@ def link_cut_view():
     form = ShortLinkForm()
 
     if form.validate_on_submit():
-        original_link = form.original_link.data
-
-        if form.custom_id.data:
-            try:
-                short_code = validate_user_code(form.custom_id.data)
-            except ValueError as e:
-                flash(str(e), 'error')
-                return render_template('link.html', form=form)
-        else:
-            short_code = get_unique_short_id()
-
-        db.session.add(URLMap(
-            original=original_link,
-            short=short_code
-        ))
-        db.session.commit()
-        short_link = generate_short_link(short_code)
-        return render_template('link.html', form=form, url=short_link)
+        try:
+            obj = URLMap.validate_user_code(
+                original_url=form.original_link.data,
+                custom_id=form.custom_id.data,
+            )
+        except ValueError as e:
+            flash(str(e), 'error')
+            return render_template('link.html', form=form)
+        return render_template(
+            'link.html', form=form, url=generate_short_link(obj.short))
     return render_template('link.html', form=form)
 
 
