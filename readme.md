@@ -1,35 +1,35 @@
-### YaCut — сервис сокращения ссылок и загрузки файлов на Яндекс.Диск
+### YaCut — URL Shortening and Yandex.Disk File Upload Service
 
-YaCut — это Flask-приложение, которое позволяет:
-- создавать короткие ссылки для произвольных URL;
-- загружать файлы на Яндекс.Диск и получать короткие ссылки на прямые скачивания;
-- использовать короткий идентификатор для быстрого перехода на исходный ресурс.
+YaCut is a Flask application that allows you to:
+- Create short links for any URL.
+- Upload files to Yandex.Disk and get short links for direct downloads.
+- Use a short identifier for quick access to the original resource.
 
-## Возможности
+## Features
 
-- Сокращение ссылок — вводите любой URL, сервис выдаёт короткий идентификатор.
-- Загрузка файлов — можно загрузить несколько файлов одновременно; файлы сохраняются на Яндекс.Диск, а пользователю возвращаются короткие ссылки для скачивания.
-- Редиректы и прокси — переход по короткой ссылке либо перенаправляет на исходный URL, либо отдаёт файл с Яндекс.Диска.
-- Асинхронная работа с API Яндекс.Диска — используется aiohttp и asyncio для параллельной загрузки файлов.
-- Безопасные соединения — все запросы выполняются с TLS/SSL при помощи certifi.
+- URL shortening — Enter any URL and the service generates a short identifier.
+- File uploads — Upload multiple files at once; files are stored on Yandex.Disk and the user receives short download links.
+- Redirects and proxy — Following a short link either redirects to the original URL or serves a file from Yandex.Disk.
+- Asynchronous interaction with the Yandex.Disk API — Uses aiohttp and asyncio for parallel file uploads.
+- Secure connections — All requests are made over TLS/SSL with trusted certificates via certifi.
+  
+## Main Routes
 
-## Основные маршруты
+- / — Form for URL shortening.
+- /files — Form for uploading files to Yandex.Disk and obtaining short download links.
+- /<short_id> — Redirect via the short link (either to the original URL or to file download).
 
-- / — форма для сокращения ссылок.
-- /files — форма для загрузки файлов на Яндекс.Диск и получения коротких ссылок.
-- /<short_id> — переход по короткой ссылке (редирект или скачивание файла).
+## Technologies
 
-## Технологии
+- Flask — Web framework.
+- SQLAlchemy — Stores link data.
+- WTForms — Form validation.
+- aiohttp, asyncio — Asynchronous requests to the Yandex.Disk API.
+- certifi — Trusted certificates for HTTPS.
 
-- Flask — веб-фреймворк.
-- SQLAlchemy — хранение данных о ссылках.
-- WTForms — валидация форм.
-- aiohttp, asyncio — асинхронные запросы к API Яндекс.Диска.
-- certifi — доверенные сертификаты для HTTPS.
+### How to Run the Yacut Project
 
-### Как запустить проект Yacut:
-
-Клонировать репозиторий и перейти в него в командной строке:
+Clone the repository and navigate into it in the command line:
 
 ```
 git clone 
@@ -39,25 +39,25 @@ git clone
 cd yacut
 ```
 
-Cоздать и активировать виртуальное окружение:
+Create and activate a virtual environment:
 
 ```
 python3 -m venv venv
 ```
 
-* Если у вас Linux/macOS
+* For Linux/macOS
 
     ```
     source venv/bin/activate
     ```
 
-* Если у вас windows
+* For Windows
 
     ```
     source venv/scripts/activate
     ```
 
-Установить зависимости из файла requirements.txt:
+Install the dependencies from the requirements.txt file:
 
 ```
 python3 -m pip install --upgrade pip
@@ -67,7 +67,7 @@ python3 -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-Создать в директории проекта файл .env с четыремя переменными окружения:
+Create a .env file in the project directory with the following four environment variables:
 
 ```
 FLASK_APP=yacut
@@ -76,13 +76,13 @@ SECRET_KEY=your_secret_key
 DB=sqlite:///db.sqlite3
 ```
 
-Создать базу данных и применить миграции:
+Create the database and apply the migrations:
 
 ```
 flask db upgrade
 ```
 
-Запустить проект:
+Start the project:
 
 ```
 flask run
