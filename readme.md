@@ -87,3 +87,8 @@ Start the project:
 ```
 flask run
 ```
+
+## Author
+
+[AlinaGay](https://github.com/AlinaGay)
+| Backend Developer • Python Engineer |
